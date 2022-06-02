@@ -94,7 +94,30 @@ class MenuController extends BaseController
     ]
      */
 
+     // Recursive function to generate menu tree
+     static function generateMenuTree($elements, $parentId = 0)
+     {
+         $branch = array();
+         foreach ($elements as $element) {
+             if($element['parent_id'] == $parentId){
+
+                $child = MenuController::generateMenuTree($elements, $element['id']);
+
+                $element['children'] = ($child) ? $child : array();
+
+                $branch[] = $element;
+             }
+         }
+         return $branch;         
+     }
+
+
     public function getMenuItems() {
-        throw new \Exception('implement in coding task 3');
+       // throw new \Exception('implement in coding task 3');
+       $menu = MenuItem::all();
+
+       $menuTree = MenuController::generateMenuTree($menu->toArray());
+
+       return response()->json($menuTree);
     }
 }
